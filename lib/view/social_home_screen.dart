@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:while_app/resources/components/message_list_widget.dart';
-import 'package:while_app/view/social/community_screenn.dart';
 import 'package:while_app/view/social/notification.dart';
 import 'package:while_app/view/social/search.dart';
 import 'package:while_app/view/social/story_screen.dart';
 
 class SocialScreen extends StatefulWidget {
-  SocialScreen({
+  const SocialScreen({
     super.key,
   });
 
@@ -87,8 +85,8 @@ class _SocialScreenState extends State<SocialScreen>
         controller: _controller,
         children: const [
           StoryScreen(),
-          MessageList(),
-          CommunityScreen(),
+          // MessageList(),
+          // CommunityScreen(),
           Text('Calls'),
         ],
       ),

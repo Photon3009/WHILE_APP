@@ -39,7 +39,7 @@ class ReelController with ChangeNotifier {
     if (source != null) {
       final pickedFile = await picker.pickVideo(source: source);
       if (pickedFile != null) {
-        // ignore: use_build_context_synchronously
+        // _selectedVideo = File(pickedFile.path);
         Navigator.pushNamed(context, RoutesName.addReel,
             arguments: pickedFile.path);
         notifyListeners();

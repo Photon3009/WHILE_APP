@@ -1,10 +1,11 @@
-import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:video_compress_plus/video_compress_plus.dart';
 import 'package:while_app/resources/components/round_button.dart';
 import 'package:while_app/resources/components/text_container_widget.dart';
 import 'package:while_app/resources/components/video_player.dart';
+
 import 'package:while_app/utils/utils.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:while_app/view_model/session_controller.dart';
@@ -18,21 +19,36 @@ class AddReel extends StatefulWidget {
 }
 
 class _AddReelState extends State<AddReel> {
+  late Subscription _subscription;
+  bool isloading = false;
+  @override
+  void initState() {
+    super.initState();
+    _subscription = VideoCompress.compressProgress$.subscribe((progress) {
+      debugPrint('progress: $progress');
+      isloading = false;
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _subscription.unsubscribe();
+  }
+
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  bool loading = false;
-
   void uploadVideo(
       BuildContext context, String title, String des, String path) async {
-    DateTime now = DateTime.now();
     setState(() {
-      loading = true;
+      isloading = true;
     });
+    DateTime now = DateTime.now();
     firebase_storage.Reference storageRef = firebase_storage
         .FirebaseStorage.instance
         .ref('content/${FirebaseSessionController().uid!}/video/$now');
     firebase_storage.UploadTask uploadTask =
-        storageRef.putFile(File(path).absolute);
+        storageRef.putFile(await _compressVideo(path));
     await Future.value(uploadTask);
     final newUrl = await storageRef.getDownloadURL();
     final user = FirebaseAuth.instance.currentUser!;
@@ -42,18 +58,18 @@ class _AddReelState extends State<AddReel> {
     final snapshot = await docRef.get();
 
     if (snapshot.exists) {
-      List<Map<String, String>> existingUrls =
-          List<Map<String, String>>.from(snapshot.data()?['urls'] ?? []);
+      final List<dynamic> dynamicUrls = snapshot.data()?['urls'] ?? [];
+      List<Map<String, String>> existingUrls = dynamicUrls
+          .map((dynamicMap) => Map<String, String>.from(dynamicMap))
+          .toList();
       existingUrls.add({'video': newUrl, 'title': title, 'description': des});
       await docRef.update({'urls': existingUrls}).then((value) {
-        setState(() {
-          loading = false;
-        });
         Utils.toastMessage('Your video is uploaded!');
-      }).onError((error, stackTrace) {
         setState(() {
-          loading = false;
+          isloading = false;
         });
+        Navigator.pop(context);
+      }).onError((error, stackTrace) {
         Utils.toastMessage(error.toString());
       });
     } else {
@@ -62,17 +78,22 @@ class _AddReelState extends State<AddReel> {
           {'video': newUrl, 'title': title, 'description': des}
         ]
       }).then((value) {
-        setState(() {
-          loading = false;
-        });
         Utils.toastMessage('Your video is uploaded!');
-      }).onError((error, stackTrace) {
         setState(() {
-          loading = false;
+          isloading = false;
         });
+        Navigator.pop(context);
+      }).onError((error, stackTrace) {
         Utils.toastMessage(error.toString());
       });
     }
+  }
+
+  _compressVideo(String videoPath) async {
+    final compressedVideo = await VideoCompress.compressVideo(videoPath,
+        quality: VideoQuality.MediumQuality, deleteOrigin: false);
+    // print(compressedVideo!.filesize);
+    return compressedVideo!.file;
   }
 
   @override
@@ -81,7 +102,7 @@ class _AddReelState extends State<AddReel> {
     final w = MediaQuery.of(context).size.width * 1;
     return Scaffold(
       appBar: AppBar(
-        title: Text("Add Reel"),
+        title: const Text("Add Reel"),
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -116,9 +137,9 @@ class _AddReelState extends State<AddReel> {
                 height: 10,
               ),
               RoundButton(
-                  title: 'Add Reel',
-                  loading: loading,
-                  onPress: () async {
+                  title: "Add Reel",
+                  loading: isloading,
+                  onPress: () {
                     if (_titleController.text.isEmpty) {
                       Utils.flushBarErrorMessage('Please enter title', context);
                     } else if (_descriptionController.text.isEmpty) {
@@ -131,7 +152,7 @@ class _AddReelState extends State<AddReel> {
                           _descriptionController.text.toString(),
                           widget.video.toString());
                     }
-                  }),
+                  })
             ],
           ),
         ),

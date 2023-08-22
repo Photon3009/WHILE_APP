@@ -7,6 +7,7 @@ class MenuContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var h=MediaQuery.of(context).size.height;
     var w=MediaQuery.of(context).size.width;
     return Container(
       width: w/2.2,
@@ -38,6 +39,7 @@ class BottomMenuContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+     var h=MediaQuery.of(context).size.height;
     var w=MediaQuery.of(context).size.width;
     return Container(
       width: w/1.1,

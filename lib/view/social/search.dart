@@ -1,11 +1,6 @@
-// import 'dart:ffi';
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
-import 'package:while_app/view/social/message_detail.dart';
-import 'package:while_app/view/social/social_home_screen.dart';
 import 'package:while_app/view_model/current_user_provider.dart';
 
 class Search extends StatefulWidget {
@@ -17,8 +12,6 @@ class Search extends StatefulWidget {
 
 class _MyAppState extends State<Search> {
   String name = "";
-
-  add() {}
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +45,7 @@ class _MyAppState extends State<Search> {
                       var userProvider =
                           Provider.of<CurrentUserProvider>(context);
                       var uid = '';
+                      // ignore: unused_local_variable
                       var alreadyFriend = '';
                       check() async {
                         String isFollowing = 'Follow';
@@ -99,15 +93,17 @@ class _MyAppState extends State<Search> {
                           }
                         }
                         if (uid != '') {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (ctx) => MessageDetailScreen(
-                                  userName: data['name'],
-                                  userImage: data['profile'],
-                                  uid: uid)));
+                          // Navigator.of(context).push(MaterialPageRoute(
+                          //     builder: (ctx) => MessageDetailScreen(
+                          //         userName: data['name'],
+                          //         userImage: data['profile'],
+                          //         friendUid: '',
+                          //         uid: uid)));
                         } else {}
                       }
 
                       void addFriend() async {
+                        // ignore: unused_local_variable
                         bool fr = false;
 
                         var n = await FirebaseFirestore.instance
@@ -241,7 +237,7 @@ class _MyAppState extends State<Search> {
                                     onPressed: () {
                                       if (snapshot.data! == 'Message') {
                                         // uid = userProvider.user.uid;
-                                        print(snapshot.data!);
+                                        // print(snapshot.data!);
                                         navigate();
                                       } else {
                                         addFriend();
@@ -294,7 +290,7 @@ class _MyAppState extends State<Search> {
                                     onPressed: () {
                                       if (snapshot.data! == 'Message') {
                                         // uid = userProvider.user.uid;
-                                        print(snapshot.data!);
+                                        // print(snapshot.data!);
                                         navigate();
                                       } else {
                                         addFriend();
@@ -310,6 +306,11 @@ class _MyAppState extends State<Search> {
                         return Container();
                       }
                     });
+
+            // : SearchWidget(
+            //     snapshots: snapshots,
+            //     name: name,
+            //   );
           },
         ));
   }
