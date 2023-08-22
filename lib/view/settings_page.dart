@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:while_app/resources/components/text_button.dart';
 import 'package:while_app/resources/components/text_container_widget.dart';
-
 import '../repository/firebase_repository.dart';
 
 class Settings extends StatelessWidget {

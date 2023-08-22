@@ -9,7 +9,6 @@ import 'package:while_app/view_model/profile_controller.dart';
 import 'utils/routes/routes.dart';
 import 'view_model/reel_controller.dart';
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -26,8 +25,7 @@ class MyApp extends StatelessWidget {
       providers: [
         Provider<FirebaseAuthMethods>(
             create: (_) => FirebaseAuthMethods(FirebaseAuth.instance)),
-            Provider<ReelController>(
-            create: (_) => ReelController()),
+        Provider<ReelController>(create: (_) => ReelController()),
         StreamProvider(
             create: (context) => context.read<FirebaseAuthMethods>().authState,
             initialData: null),
